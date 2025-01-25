@@ -80,21 +80,48 @@ function App() {
     }
   }, []);
 
+
   return (
     <div className="App">
-      <h1>Fundraiser App</h1>
-      {account ? (
-        <div>
-          <p>Connected as: {account}</p>
-          <p>Network: {network ? network.name : "Loading..."}</p>
-          <p>Balance: {balance} ETH</p>
-          <button onClick={sendTransaction}>Send 0.01 ETH</button>
+      <div className="content">
+        <h1 className="title">UNICEF Fundraiser</h1>
+        <div className="grid">
+          <div className="text-content">
+            <p className="mission">
+              We are a Bucharest-based fundraising NGO that seeks to raise funds through blockchain 
+              and transfer them to a bigger organization that can handle our cause.
+              <br />
+              We want to help raise money for helping vulnerable children all across the UN.
+            </p>
+
+            {account ? (
+              <div className="info">
+                <p><strong>You are connected as:</strong> {account}</p>
+                <p><strong>You are using the network:</strong> {network ? network.name : "Loading..."}</p>
+                <p><strong>Your Ethereum balance:</strong> {balance} ETH</p>
+                <div className="button-container">
+                  <button className="btn-primary" onClick={sendTransaction}>
+                    Send 0.01 ETH
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button className="btn-primary" onClick={connectWallet}>
+                Connect MetaMask
+              </button>
+            )}
+          </div>
+          <img
+            src={require("./img/unicef.png")}
+            alt="UNICEF Logo"
+            className="image"
+          />
         </div>
-      ) : (
-        <button onClick={connectWallet}>Connect MetaMask</button>
-      )}
+      </div>
     </div>
   );
+
+
 }
 
 export default App;

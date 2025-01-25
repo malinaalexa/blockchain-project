@@ -1,14 +1,103 @@
-/* src/index.css */
+/* General Styling */
 body {
     margin: 0;
-    font-family: Arial, sans-serif;
-    background-color: #f0f0f0;
+    font-family: "Roboto", sans-serif;
+    background: linear-gradient(to bottom, #10859f, #0e5fed);
+    color: white;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
   }
   
-  h1 {
+  /* Main container */
+  .App {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  /* Title */
+  .title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+  }
+  
+  /* Grid layout */
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    align-items: center;
+  }
+  
+  /* Text Content */
+  .text-content {
+    background: rgba(255, 255, 255, 0.9);
     color: #333;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
   }
   
-  p {
-    color: #666;
+  /* Mission text */
+  .mission {
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 20px;
   }
+  
+  /* Info Section */
+  .info p {
+    font-size: 1rem;
+    margin: 10px 0;
+  }
+  
+  /* Button Styling */
+  .btn-primary {
+    background: #33aaff;
+    color: white;
+    font-size: 1rem;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-primary:hover {
+    background: #103651;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  }
+  
+  .button-container {
+    margin-top: 20px;
+  }
+  
+  /* Image Styling */
+  .image {
+    border: none; /* Removes any explicit borders */
+    padding: 0;   /* Removes padding around the image */
+    margin: 0;    /* Ensures no additional space */
+    box-shadow: none; /* Removes shadows if applied */
+  }
+  
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  
+    .text-content {
+      margin-bottom: 20px;
+    }
+  }
+
+  h1{
+    color:#d5e1f6;
+  }
+  
