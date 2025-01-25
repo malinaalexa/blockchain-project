@@ -79,14 +79,14 @@ body {
   
   /* Image Styling */
   .image {
-    border: none; /* Removes any explicit borders */
-    padding: 0;   /* Removes padding around the image */
-    margin: 0;    /* Ensures no additional space */
-    box-shadow: none; /* Removes shadows if applied */
+    border: none; 
+    padding: 0;   
+    margin: 0; 
+    box-shadow: none; 
   }
   
   
-  /* Responsive Design */
+
   @media (max-width: 768px) {
     .grid {
       grid-template-columns: 1fr;
