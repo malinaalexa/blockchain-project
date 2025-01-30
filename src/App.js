@@ -5,16 +5,22 @@ function App() {
   const [account, setAccount] = useState(null);
   const [balance, setBalance] = useState(null);
   const [network, setNetwork] = useState(null);
+  const [donations, setDonations] = useState([]); // For storing recent donations
+  const [donationAmount, setDonationAmount] = useState(""); // For user input of donation amount
 
-  // Verifică dacă MetaMask este disponibil și conectează contul
+  const contractAddress = "0x42E8D3E90Bd0251C1C1aEf382c82e092bDACC736";  // Replace with your contract address
+  const contractABI = [
+    "event DonationReceived(address indexed donor, uint256 amount)", // ABI event
+    "function donate() external payable", // Add donate function to ABI
+  ];
+
+  // Connect wallet and check network
   const connectWallet = async () => {
     if (window.ethereum) {
       try {
-        // Solicită accesul la conturile MetaMask
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         setAccount(accounts[0]);
 
-        // Verifică rețeaua MetaMask pentru a asigura că suntem pe Sepolia
         const provider = new ethers.BrowserProvider(window.ethereum);
         const network = await provider.getNetwork();
         setNetwork(network);
@@ -24,9 +30,8 @@ function App() {
           return;
         }
 
-        // Obține balanța contului pe Sepolia
         const balance = await provider.getBalance(accounts[0]);
-        setBalance(ethers.formatEther(balance)); // Convertim balanța în Ether
+        setBalance(ethers.formatEther(balance)); // Convert balance to Ether
       } catch (error) {
         console.log("Error connecting to MetaMask:", error);
       }
@@ -35,10 +40,15 @@ function App() {
     }
   };
 
-  // Tranzacționează din contul conectat
+  // Handle donation input change
+  const handleDonationChange = (event) => {
+    setDonationAmount(event.target.value);
+  };
+
+  // Send donation via contract
   const sendTransaction = async () => {
-    if (!account) {
-      alert("Please connect your wallet first.");
+    if (!account || !donationAmount) {
+      alert("Please connect your wallet and enter an amount to donate.");
       return;
     }
 
@@ -46,40 +56,47 @@ function App() {
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
 
-      const tx = await signer.sendTransaction({
-        to: "0xC3BcD54b99c40e7886a85A1fA827A82E78A6dd52", // Înlocuiește cu adresa destinatarului
-        value: ethers.parseEther("0.01"), // Suma în ETH de trimis
+      // Instantiate contract
+      const contract = new ethers.Contract(contractAddress, contractABI, signer);
+
+      const donationInWei = ethers.parseEther(donationAmount); // Convert user input to Wei
+
+      const tx = await contract.donate({
+        value: donationInWei, // Use user-provided donation amount
       });
 
-      console.log("Transaction sent:", tx);
-      alert("Transaction sent!");
+      console.log("Donation sent:", tx);
+
+      await tx.wait(); // Wait for transaction confirmation
+      alert("Donation sent and confirmed!");
     } catch (error) {
       console.log("Transaction failed:", error);
+      alert("Transaction failed, please try again.");
     }
   };
 
+  // Listen to the DonationReceived event to update donations state
   useEffect(() => {
-    if (window.ethereum) {
-      // Căutăm contul MetaMask la încărcarea aplicației
-      window.ethereum.request({ method: 'eth_accounts' }).then((accounts) => {
-        if (accounts.length > 0) {
-          setAccount(accounts[0]);
-          const provider = new ethers.BrowserProvider(window.ethereum);
-          provider.getNetwork().then((network) => {
-            setNetwork(network);
-            if (network.name === 'sepolia') {
-              provider.getBalance(accounts[0]).then((balance) => {
-                setBalance(ethers.formatEther(balance));
-              });
-            } else {
-              alert('Please switch to the Sepolia network in MetaMask!');
-            }
-          });
-        }
-      });
-    }
-  }, []);
+    if (window.ethereum && account) {
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const contract = new ethers.Contract(contractAddress, contractABI, provider);
 
+      // Listen for the DonationReceived event
+      contract.on('DonationReceived', (donor, amount) => {
+        console.log(`Donation received from ${donor}: ${ethers.formatEther(amount)} ETH`);
+        
+        // Add donation to state
+        setDonations((prevDonations) => [
+          ...prevDonations,
+          { donor, amount: ethers.formatEther(amount) },
+        ]);
+      });
+
+      return () => {
+        contract.removeAllListeners('DonationReceived');
+      };
+    }
+  }, [account]);
 
   return (
     <div className="App">
@@ -99,11 +116,31 @@ function App() {
                 <p><strong>You are connected as:</strong> {account}</p>
                 <p><strong>You are using the network:</strong> {network ? network.name : "Loading..."}</p>
                 <p><strong>Your Ethereum balance:</strong> {balance} ETH</p>
+
+                {/* Donation input field */}
+                <div>
+                  <input
+                    type="text"
+                    placeholder="Enter donation amount (ETH)"
+                    value={donationAmount}
+                    onChange={handleDonationChange}
+                  />
+                </div>
+
                 <div className="button-container">
                   <button className="btn-primary" onClick={sendTransaction}>
-                    Send 0.01 ETH
+                    Donate {donationAmount} ETH
                   </button>
                 </div>
+
+                <h3>Recent Donations:</h3>
+
+                  {donations.map((donation, index) => (
+                    <p key={index}>
+                      Donor: {donation.donor} | Amount: {donation.amount} ETH
+                    </p>
+                  ))}
+
               </div>
             ) : (
               <button className="btn-primary" onClick={connectWallet}>
@@ -120,8 +157,6 @@ function App() {
       </div>
     </div>
   );
-
-
 }
 
 export default App;
