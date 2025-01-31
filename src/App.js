@@ -8,10 +8,10 @@ function App() {
   const [donations, setDonations] = useState([]); // For storing recent donations
   const [donationAmount, setDonationAmount] = useState(""); // For user input of donation amount
 
-  const contractAddress = "0x42E8D3E90Bd0251C1C1aEf382c82e092bDACC736";  // Replace with your contract address
+  const contractAddress = "0x42E8D3E90Bd0251C1C1aEf382c82e092bDACC736"; 
   const contractABI = [
-    "event DonationReceived(address indexed donor, uint256 amount)", // ABI event
-    "function donate() external payable", // Add donate function to ABI
+    "event DonationReceived(address indexed donor, uint256 amount)",
+    "function donate() external payable", 
   ];
 
   // Connect wallet and check network
@@ -59,7 +59,7 @@ function App() {
       // Instantiate contract
       const contract = new ethers.Contract(contractAddress, contractABI, signer);
 
-      const donationInWei = ethers.parseEther(donationAmount); // Convert user input to Wei
+      const donationInWei = ethers.parseEther(donationAmount); 
 
       const tx = await contract.donate({
         value: donationInWei, // Use user-provided donation amount
